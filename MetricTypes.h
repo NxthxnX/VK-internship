@@ -4,20 +4,20 @@
 #include <atomic>
 #include <iomanip>
 
-// Метрика-счетчик для подсчитывания количества событий
-// Может использоваться для подсчёта количества HTTP-запросов
-// std::atomic - потокобезопасные инкременты
+// РњРµС‚СЂРёРєР°-СЃС‡РµС‚С‡РёРє РґР»СЏ РїРѕРґСЃС‡РёС‚С‹РІР°РЅРёСЏ РєРѕР»РёС‡РµСЃС‚РІР° СЃРѕР±С‹С‚РёР№
+// РњРѕР¶РµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ РґР»СЏ РїРѕРґСЃС‡С‘С‚Р° РєРѕР»РёС‡РµСЃС‚РІР° HTTP-Р·Р°РїСЂРѕСЃРѕРІ
+// std::atomic - РїРѕС‚РѕРєРѕР±РµР·РѕРїР°СЃРЅС‹Рµ РёРЅРєСЂРµРјРµРЅС‚С‹
 class CounterMetric : public IMetric {
 public:
     explicit CounterMetric(const std::string& name) : IMetric(name) {}
 
     void increment(int value = 1) {
-        // fetch_add потокобезопасен; relaxed режим подходит для счётчика
+        // fetch_add РїРѕС‚РѕРєРѕР±РµР·РѕРїР°СЃРµРЅ; relaxed СЂРµР¶РёРј РїРѕРґС…РѕРґРёС‚ РґР»СЏ СЃС‡С‘С‚С‡РёРєР°
         counter_.fetch_add(value, std::memory_order_relaxed);
     }
 
     void write_value_to_stream(std::ostream& os) override {
-        // memory_order_relaxed достаточно, так как нам не нужно синхронизировать другие данные
+        // memory_order_relaxed РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ, С‚Р°Рє РєР°Рє РЅР°Рј РЅРµ РЅСѓР¶РЅРѕ СЃРёРЅС…СЂРѕРЅРёР·РёСЂРѕРІР°С‚СЊ РґСЂСѓРіРёРµ РґР°РЅРЅС‹Рµ
         os << counter_.load(std::memory_order_relaxed);
     }
 
@@ -29,8 +29,8 @@ private:
     std::atomic<int> counter_{ 0 };
 };
 
-// Метрика для вычисления среднего значения
-// Может использоваться для средней утилизации CPU за секунду
+// РњРµС‚СЂРёРєР° РґР»СЏ РІС‹С‡РёСЃР»РµРЅРёСЏ СЃСЂРµРґРЅРµРіРѕ Р·РЅР°С‡РµРЅРёСЏ
+// РњРѕР¶РµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ РґР»СЏ СЃСЂРµРґРЅРµР№ СѓС‚РёР»РёР·Р°С†РёРё CPU Р·Р° СЃРµРєСѓРЅРґСѓ
 class AverageMetric : public IMetric {
 public:
     explicit AverageMetric(const std::string& name) : IMetric(name) {}
